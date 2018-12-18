@@ -8,7 +8,11 @@
 #
 
 # Pull base image.
-FROM dockerfile/ubuntu
+FROM ubuntu
+
+RUN apt-get update
+# On some Linux 4.19, the following fails. Workaround (before running docker build): sudo bash -c "echo N > /sys/module/overlay/parameters/metacopy"
+RUN echo Y | apt-get install  software-properties-common
 
 # Install Java.
 RUN \
@@ -16,8 +20,9 @@ RUN \
   echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \
   add-apt-repository -y ppa:webupd8team/java && \
   apt-get update && \
-  apt-get install -y oracle-java7-installer
+  apt-get install -y oracle-java8-installer
 
+RUN echo y | apt-get install curl
 # Install Leiningen.
 RUN curl -s https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > \
     /usr/local/bin/lein && \
